@@ -1,0 +1,40 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Student Group Manager</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="{% static 'groups/styles.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <div class="logo">Student Group Manager</div>
+      <nav class="nav">
+        <a href="{% url 'groups:home' %}">Home</a>
+        <a href="{% url 'groups:admin_unlock' %}">Admin Unlock</a>
+        <a href="{% url 'groups:confirm_reset' %}">Reset System</a>
+        {% if is_admin %}
+          <a href="{% url 'groups:admin_logout' %}">Logout Admin</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% if messages %}
+      <ul class="messages">
+        {% for m in messages %}
+          <li class="msg {{ m.tags }}">{{ m }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="container foot">
+    <small>Student Group Manager App</small>
+  </footer>
+</body>
+</html>

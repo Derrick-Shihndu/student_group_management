@@ -1,0 +1,11 @@
+{% extends 'groups/base.html' %}
+{% block content %}
+<h1>Reset System</h1>
+<p>This will remove all classes and data from the system (irreversible).</p>
+<form method="post">
+  {% csrf_token %}
+  <label>Enter master admin password to confirm</label>
+  <input type="password" name="master_password" required>
+  <button class="btn" type="submit">Confirm Reset</button>
+</form>
+{% endblock %}

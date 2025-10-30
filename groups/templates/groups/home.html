@@ -1,0 +1,24 @@
+{% extends 'groups/base.html' %}
+{% block content %}
+<h1>Classes</h1>
+<p>Available main groups / classes:</p>
+
+{% if not classes %}
+  <p>No classes yet.</p>
+{% endif %}
+
+<div class="classes">
+  {% for cls in classes %}
+    <div class="class-card">
+      <h3><a href="{% url 'groups:class_detail' cls.pk %}">{{ cls.name }}</a></h3>
+      <div class="small">Created: {{ cls.created_at }}</div>
+      <div class="small">Subgroups: {{ cls.subgroups.count }} — Max per group: {{ cls.max_members }}</div>
+      <div class="small">Courses: {% for c in cls.courses.all %}{{ c.name }}{% if not forloop.last %}, {% endif %}{% empty %}No courses{% endfor %}</div>
+      <div style="margin-top:8px">
+        <a class="btn" href="{% url 'groups:class_detail' cls.pk %}">Open</a>
+        <a class="btn" href="{% url 'groups:register' cls.pk %}">Register</a>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

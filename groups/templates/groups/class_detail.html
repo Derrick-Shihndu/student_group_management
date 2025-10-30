@@ -1,0 +1,86 @@
+{% extends 'groups/base.html' %}
+{% block content %}
+<h1>{{ cls.name }}</h1>
+<p class="small">Max members per subgroup: {{ cls.max_members }} &nbsp; | &nbsp; Delegate: {{ cls.delegate_phone|default:"None" }}</p>
+
+<div class="subgroups-grid">
+  {% for sg in subgroups %}
+    <div class="group-card">
+      <h3>{{ sg.name }} <span class="chip">{{ sg.members.count }}/{{ cls.max_members }}</span></h3>
+      {% if sg.leader %}
+        <div class="leader">Leader: {{ sg.leader.name1 }} {{ sg.leader.name2 }}</div>
+      {% else %}
+        {% if sg.members.count >= cls.max_members %}
+          <div class="small">Full — leader not chosen yet</div>
+          <form method="post" action="{% url 'groups:select_leader' cls.pk sg.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn">Select Leader</button>
+          </form>
+        {% endif %}
+      {% endif %}
+
+      <ul class="members">
+        {% for m in sg.members.all %}
+          <li><strong>{{ forloop.counter }}. {{ m.name1 }} {{ m.name2 }}{% if m.name3 %} {{ m.name3 }}{% endif %}</strong><br><small>{{ m.email }} • {{ m.phone }}</small></li>
+        {% empty %}
+          <li class="small">No members yet</li>
+        {% endfor %}
+      </ul>
+
+      <div class="notes">
+        <h4>Notes</h4>
+        {% for note in sg.notes.all %}
+          <div class="note"><strong>{{ note.title }}</strong><p>{{ note.content }}</p><small>{{ note.posted_at }}</small></div>
+        {% empty %}
+          <div class="small">No notes</div>
+        {% endfor %}
+      </div>
+
+      <div class="messages">
+        <h4>Messages</h4>
+        {% for msg in sg.messages.all %}
+          <div class="note"><p>{{ msg.content }}</p><small>{{ msg.posted_at }}</small></div>
+        {% empty %}
+          <div class="small">No messages</div>
+        {% endfor %}
+      </div>
+
+      <div style="margin-top:8px">
+        <a class="btn" href="{% url 'groups:register' cls.pk %}">Register to this class</a>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<hr>
+{% if is_admin %}
+  <h3>Admin actions</h3>
+  <h4>Post Note</h4>
+  <form method="post" action="{% url 'groups:post_note' cls.pk %}">
+    {% csrf_token %}
+    <label>Subgroup</label>
+    <select name="subgroup">
+      {% for sg in subgroups %}<option value="{{ sg.pk }}">{{ sg.name }}</option>{% endfor %}
+    </select>
+    <label>Title</label>
+    <input name="title">
+    <label>Content</label>
+    <textarea name="content"></textarea>
+    <button class="btn" type="submit">Post Note</button>
+  </form>
+
+  <h4>Post Message</h4>
+  <form method="post" action="{% url 'groups:post_message' cls.pk %}">
+    {% csrf_token %}
+    <label>Subgroup</label>
+    <select name="subgroup">
+      {% for sg in subgroups %}<option value="{{ sg.pk }}">{{ sg.name }}</option>{% endfor %}
+    </select>
+    <label>Message</label>
+    <textarea name="content"></textarea>
+    <button class="btn" type="submit">Post Message</button>
+  </form>
+{% else %}
+  <p class="small">Admin actions are hidden. <a href="{% url 'groups:admin_unlock' %}">Unlock admin</a></p>
+{% endif %}
+{% endblock %}

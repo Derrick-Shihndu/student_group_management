@@ -1,0 +1,20 @@
+{% extends 'groups/base.html' %}
+{% block content %}
+<h1>Register for {{ cls.name }}</h1>
+<form method="post">
+  {% csrf_token %}
+  <label>Join password</label>
+  <input type="password" name="join_password" placeholder="Enter join password to proceed" required>
+
+  <label>Pick subgroup</label>
+  <select name="subgroup">
+    {% for sg in subgroups %}
+      <option value="{{ sg.pk }}">{{ sg.name }} ({{ sg.members.count }}/{{ cls.max_members }})</option>
+    {% endfor %}
+  </select>
+
+  {{ form.as_p }}
+
+  <button class="btn" type="submit">Register</button>
+</form>
+{% endblock %}
