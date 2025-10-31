@@ -5,13 +5,11 @@ import dj_database_url
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# Security
 SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-me')
-
-# SECURITY WARNING: don’t run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-# Allow Render domain + localhost for testing
+# Allowed hosts (Render + local)
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
@@ -61,14 +59,21 @@ TEMPLATES = [
 WSGI_APPLICATION = 'student_group_system.wsgi.application'
 
 # -------------------------------------------------------------------
-# Database (SQLite locally, PostgreSQL on Render)
+# Database configuration (Neon for production, SQLite for local)
 # -------------------------------------------------------------------
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600
-    )
-}
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # -------------------------------------------------------------------
 # Password validation
@@ -89,13 +94,11 @@ USE_I18N = True
 USE_TZ = True
 
 # -------------------------------------------------------------------
-# Static & Media Files (Render-compatible)
+# Static & Media Files
 # -------------------------------------------------------------------
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'groups' / 'static']
-
-# WhiteNoise will serve these efficiently in production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # -------------------------------------------------------------------
